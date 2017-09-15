@@ -16,10 +16,20 @@ def LeiaMatriz(Mat, NomeArq):
     i = 0
     for linha in arq:
         v = linha.split()
-        # transforma os strings em números inteiros
-        for j in range(len(v)):
-            Mat[i][j] = int(v[j])
-        i = i + 1
+        # verifica se tem 9 elementos
+        if len(v) != 9:
+            return False
+        # assume que é int, se não for, retorna falso
+        try:
+            # transforma os strings em números inteiros
+            for j in range(len(v)):
+                num = int(v[j])
+                if num < 0 or num > 9:
+                    return False # numeros negativos ou acima de 9
+                Mat[i][j] = num
+            i = i + 1
+        except:
+            return False
     # fechar arquivo
     arq.close()
     return True
@@ -76,11 +86,14 @@ def TestaMatrizPreenchida(Mat):
                 return False
 
     return True
+
 # devolve True se a matriz lida Mat está com as casas já preenchidas com os
 # valores corretos. Não há repetições na linha, na coluna ou no quadrado interno.
 def TestaMatrizLida(Mat):
     for Lin in range(9):
         for Col in range(9):
+            if (Mat[Lin][Col] == 0):
+                continue
             Coluna = ProcuraElementoLinha(Mat, Lin, Mat[Lin][Col])
             if( Coluna != -1 and Coluna != Col):
                 return False
@@ -93,13 +106,6 @@ def TestaMatrizLida(Mat):
                     if(x != -1 and y != -1 and x != Lin and y != Col):
                         return False
     return True
-
-# def AchaCasaVazia(Mat):
-#     for Lin in range(1,10):
-#         for Col in range(1,10):
-#             if Mat[Lin][Col] == 0:
-#                 return Lin, Col
-#     return -1, -1
 
 def AchaCandidatos(Mat, Lin, Col):
     candidatos = [1,2,3,4,5,6,7,8,9]
@@ -122,6 +128,10 @@ def Sudoku(Mat, Lin, Col):
     if TestaMatrizPreenchida(Mat) == True:
         if TestaMatrizLida(Mat) == True:
             print "\n* * * Matriz Completa\n"
+            
+            global solucoes
+            solucoes = solucoes + 1
+            
             ImprimaMatriz(Mat)
         return
     else:
@@ -129,43 +139,21 @@ def Sudoku(Mat, Lin, Col):
             if Col < 8:
                 Sudoku(Mat, Lin, Col + 1)
             else:
-                if Lin < 8:
-                    Sudoku(Mat, Lin + 1, 0)
-                else:
-                    print "\n* * * Terminei o Sudoku"
-                    ImprimaMatriz(Mat)
-                    return
+                Sudoku(Mat, Lin + 1, 0)
+            # else:
+            #     if Lin < 8:
+            #         Sudoku(Mat, Lin + 1, 0)
+            #     else:
+            #         print "\n& & & Não Deveria Chegar Aqui & & &"
+            #         return
         else:
+            print("\nSUDOKU FUNCTION:\n")
+            ImprimaMatriz(Mat)
             candidatos = AchaCandidatos(Mat, Lin, Col)
+            print "\nLIN: {} COL: {} CAND: {}".format(Lin, Col, candidatos)
             for candidato in candidatos:
                 Mat[Lin][Col] = candidato
                 Sudoku(Mat, Lin, Col)
-
-    # candidatos = AchaCandidatos(Mat, Lin, Col)
-    
-    # if Mat[Lin][Col] != 0 or len(candidatos) == 0:
-    #     if Col < 8:
-    #         Sudoku(Mat, Lin, Col + 1)
-    #     else:
-    #         if Lin < 8:
-    #             Sudoku(Mat, Lin + 1, 0)
-    #         else:
-    #             print "terminei o sudoku"
-    #             ImprimaMatriz(Mat)
-    # else:
-    #     print Lin, Col
-        
-    #     # if :
-    #     #     print "[ Return ] Candidatos == 0 "
-    #     #     return -1
-    #     # else:
-    #     #     print candidatos[0]
-    #     #     if TestaMatrizPreenchida(Mat) == True:
-    #     #         print "\n* * * Matriz Completa\n"
-    #     #         ImprimaMatriz(Mat)
-    #     #         return -1
-    #     #     else:
-    #     #         return -1 
 
 def main(): 
 
@@ -173,19 +161,24 @@ def main():
     #     arquivo = raw_input("\nEntre com o nome do arquivo:")
     Mat = [9 * [0] for i in range(9)]
 
-    if(LeiaMatriz(Mat, 'sudoku1.txt')):
+    if(LeiaMatriz(Mat, 'sudoku2.txt')):
+        if TestaMatrizLida(Mat):
+            print "\n* * * Matriz inicial * * *\n"
+            ImprimaMatriz(Mat)
+            
+            Sudoku(Mat, 0, 0)
 
-        print "\n* * * Matriz inicial * * *\n"
-        ImprimaMatriz(Mat)
-        
-        Sudoku(Mat, 0, 0)
-
-        return -1
-    
+            return -1
+        else:
+            print "\n* * * Matriz inconsistente - Números Repetidos * * *\n"    
+    else:
+        print "\n* * * Matriz inconsistente * * *\n"
     return -1
 
 if __name__ == "__main__":
-
+    
+    solucoes = 0
+    
     tempo1 = time.clock()
     
     main()
@@ -193,4 +186,6 @@ if __name__ == "__main__":
     tempo2 = time.clock()
     tempo_decorrido = tempo2 - tempo1
 
-    print "* * * - Tempo decorrido =", tempo_decorrido, "segundos"
+    print "* * * - Tempo decorrido =", tempo_decorrido, "segundos\n"
+
+    print "* * * {} soluções possíveis para essa matriz".format(solucoes)
