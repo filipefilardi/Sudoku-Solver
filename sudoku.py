@@ -147,13 +147,14 @@ def Sudoku(Mat, Lin, Col):
             #         print "\n& & & Não Deveria Chegar Aqui & & &"
             #         return
         else:
-            print("\nSUDOKU FUNCTION:\n")
-            ImprimaMatriz(Mat)
+            # print("\nSUDOKU FUNCTION:\n")
+            # ImprimaMatriz(Mat)
             candidatos = AchaCandidatos(Mat, Lin, Col)
-            print "\nLIN: {} COL: {} CAND: {}".format(Lin, Col, candidatos)
+            #print "\nLIN: {} COL: {} CAND: {}".format(Lin, Col, candidatos)
             for candidato in candidatos:
                 Mat[Lin][Col] = candidato
                 Sudoku(Mat, Lin, Col)
+                Mat[Lin][Col] = 0
 
 def main(): 
 
@@ -161,7 +162,7 @@ def main():
     #     arquivo = raw_input("\nEntre com o nome do arquivo:")
     Mat = [9 * [0] for i in range(9)]
 
-    if(LeiaMatriz(Mat, 'sudoku2.txt')):
+    if(LeiaMatriz(Mat, 'sudoku13.txt')):
         if TestaMatrizLida(Mat):
             print "\n* * * Matriz inicial * * *\n"
             ImprimaMatriz(Mat)
